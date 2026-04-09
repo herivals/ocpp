@@ -1,0 +1,26 @@
+{
+  "name": "ocpp16-central-system",
+  "version": "1.0.0",
+  "description": "Production-ready OCPP 1.6 central system server with ocpp-rpc",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "ocpp",
+    "ocpp1.6",
+    "evse",
+    "websocket",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.22.1",
+    "ocpp-rpc": "^2.2.1",
+    "ws": "^8.20.0"
+  }
+}

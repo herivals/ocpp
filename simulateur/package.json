@@ -1,0 +1,16 @@
+{
+  "name": "ocpp-autel-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simulateur de borne OCPP 1.6 (style Autel) pour tests CSMS",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node simulator/client.js",
+    "sim": "node simulator/client.js"
+  },
+  "dependencies": {
+    "ocpp-rpc": "^2.2.1"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "info": {
+    "_postman_id": "4c283673-a99f-4fd1-a27b-1abf0f8fc8a1",
+    "name": "OCPP 1.6 Server API",
+    "description": "Collection Postman pour tester l'API REST du serveur OCPP (Express).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RemoteStartTransaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identity\": \"{{identity}}\",\n  \"idTag\": \"{{idTag}}\",\n  \"connectorId\": {{connectorId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/start",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "start"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RemoteStopTransaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identity\": \"{{identity}}\",\n  \"transactionId\": {{transactionId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/stop",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "stop"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reset",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identity\": \"{{identity}}\",\n  \"type\": \"{{resetType}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/reset",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "reset"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "identity",
+      "value": "AUTEL_SIM_001"
+    },
+    {
+      "key": "idTag",
+      "value": "ABC123"
+    },
+    {
+      "key": "connectorId",
+      "value": "1"
+    },
+    {
+      "key": "transactionId",
+      "value": "1001"
+    },
+    {
+      "key": "resetType",
+      "value": "Soft"
+    }
+  ]
+}
