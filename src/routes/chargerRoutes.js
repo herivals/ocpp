@@ -26,6 +26,14 @@ function mapErrorToHttp(error) {
     return { status: 502, body: { error: error.message } };
   }
 
+  if (error?.code === 'FILE_NOT_FOUND') {
+    return { status: 404, body: { error: error.message } };
+  }
+
+  if (error?.code === 'INVALID_JSON' || error?.code === 'INVALID_CONFIG_FILE') {
+    return { status: 400, body: { error: error.message } };
+  }
+
   return { status: 500, body: { error: error?.message || 'Internal error' } };
 }
 
@@ -53,6 +61,38 @@ function createChargerRoutes({ chargePointService, logger }) {
       return res.json(buildConfigResponse(chargerId, result));
     } catch (error) {
       logger.error(`GET /chargers/${chargerId}/config/${configKey} failed`, {
+        message: error.message,
+        code: error.code
+      });
+      const httpError = mapErrorToHttp(error);
+      return res.status(httpError.status).json(httpError.body);
+    }
+  });
+
+  router.post('/:id/apply-config', async (req, res) => {
+    const chargerId = req.params.id;
+    const { filePath, dryRun = false } = req.body || {};
+
+    if (!filePath || typeof filePath !== 'string') {
+      return res.status(400).json({ error: 'filePath is required' });
+    }
+
+    try {
+      const summary = await chargePointService.applyConfigurationFromFile(chargerId, filePath, {
+        dryRun
+      });
+
+      return res.json({
+        chargerId: summary.chargerId,
+        total: summary.total,
+        successCount: summary.successCount,
+        errorCount: summary.errorCount,
+        skippedReadonlyCount: summary.skippedReadonlyCount,
+        dryRun: summary.dryRun,
+        results: summary.results
+      });
+    } catch (error) {
+      logger.error(`POST /chargers/${chargerId}/apply-config failed`, {
         message: error.message,
         code: error.code
       });

@@ -1,0 +1,540 @@
+{
+    "chargerId": "AE9007H2GS9C00552D",
+    "keys": [
+        {
+            "key": "AllowCSMSTLSWildcards",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "AllowOfflineAutocharge",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "AllowOfflineTxForUnknownId",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "ALMDLBConfigInfo",
+            "value": "{\"demand\":1,\"maxCurr\":640,\"mode\":0,\"offlineCurr\":0,\"peakPriceDerating\":100.0,\"phase\":0,\"reservePercent\":0,\"siteKey\":\"1707288517093699595\",\"type\":1}\n",
+            "readonly": false
+        },
+        {
+            "key": "AuthorizationCacheEnabled",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "AuthorizationKey",
+            "value": null,
+            "readonly": false
+        },
+        {
+            "key": "AuthorizeRemoteTxRequests",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "BackPlateId",
+            "value": "1D79F6FB820000",
+            "readonly": true
+        },
+        {
+            "key": "CentralContractValidationAllowed",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "ChargeProfileMaxStackLevel",
+            "value": "40",
+            "readonly": true
+        },
+        {
+            "key": "ChargerActiveStatus",
+            "value": "true",
+            "readonly": true
+        },
+        {
+            "key": "ChargingScheduleAllowedChargingRateUnit",
+            "value": "Current,Power",
+            "readonly": true
+        },
+        {
+            "key": "ChargingScheduleMaxPeriods",
+            "value": "48",
+            "readonly": true
+        },
+        {
+            "key": "ClockAlignedDataInterval",
+            "value": "1800",
+            "readonly": false
+        },
+        {
+            "key": "CloudPosIdTagPrefix",
+            "value": "POS1",
+            "readonly": false
+        },
+        {
+            "key": "ConnectionTimeOut",
+            "value": "30",
+            "readonly": false
+        },
+        {
+            "key": "Connector1ConnectionType",
+            "value": "Shutter",
+            "readonly": true
+        },
+        {
+            "key": "Connector1Id",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "Connector1Type",
+            "value": "sType2",
+            "readonly": true
+        },
+        {
+            "key": "ConnectorPhaseRotation",
+            "value": "NotApplicable",
+            "readonly": false
+        },
+        {
+            "key": "ConnectorSwitch3to1PhaseSupported",
+            "value": "false",
+            "readonly": true
+        },
+        {
+            "key": "ContractValidationOffline",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "CpoName",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "CSDLBConfigParam",
+            "value": "{\"addr\":3,\"circuit\":1000,\"csMaxCurr\":0,\"csOfflineCurr\":0,\"enable\":0,\"installPhase\":0,\"siteKey\":\"1707288517093699595\",\"type\":1}\n",
+            "readonly": false
+        },
+        {
+            "key": "CSId",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "CustomCloudPosIdtag",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "CustomLocalIdtag",
+            "value": "01AUTEL0000000000005",
+            "readonly": false
+        },
+        {
+            "key": "CustomPosIdtag",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "CustomTemperatureInterval",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "displayLanguage",
+            "value": "NA",
+            "readonly": false
+        },
+        {
+            "key": "DryContactCtrlEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "DryContactCtrlMode",
+            "value": "2",
+            "readonly": false
+        },
+        {
+            "key": "DryContactLimitCurrent",
+            "value": "32.000000",
+            "readonly": false
+        },
+        {
+            "key": "DryContactTriggerMode",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "EMSConfigurationInfo",
+            "value": "{\"enable\":false}",
+            "readonly": false
+        },
+        {
+            "key": "FreeVend",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "FreeVendIdTag",
+            "value": "01AUTEL0000000000001",
+            "readonly": false
+        },
+        {
+            "key": "FullStackKeepAlive",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "GetConfigurationMaxKeys",
+            "value": "107",
+            "readonly": true
+        },
+        {
+            "key": "GridGroundingType",
+            "value": "TN/TT",
+            "readonly": false
+        },
+        {
+            "key": "HeartbeatInterval",
+            "value": "60",
+            "readonly": false
+        },
+        {
+            "key": "HideChargingEnergyEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "Identity",
+            "value": "AE9007H2GS9C00552D",
+            "readonly": false
+        },
+        {
+            "key": "ISO15118PnCEnabled",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "LedLightBrightness",
+            "value": "50",
+            "readonly": false
+        },
+        {
+            "key": "LocalAuthListEnabled",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "LocalAuthListMaxLength",
+            "value": "10",
+            "readonly": true
+        },
+        {
+            "key": "LocalAuthorizeOffline",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "LocalPreAuthorize",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "LPEnergyNotifyEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "MaxChargeCurrentLimit",
+            "value": "32",
+            "readonly": false
+        },
+        {
+            "key": "MaxChargingProfilesInstalled",
+            "value": "40",
+            "readonly": true
+        },
+        {
+            "key": "MeterValuesAlignedData",
+            "value": "Energy.Active.Import.Register,Voltage,Current.Import,Power.Active.Import,Power.Offered,Current.Offered",
+            "readonly": false
+        },
+        {
+            "key": "MeterValueSampleInterval",
+            "value": "10",
+            "readonly": false
+        },
+        {
+            "key": "MeterValuesSampledData",
+            "value": "Energy.Active.Import.Register,Voltage,Current.Import,Power.Active.Import,Power.Offered,Current.Offered",
+            "readonly": false
+        },
+        {
+            "key": "MobileLinkInfo",
+            "value": "{\"enable\":false}",
+            "readonly": false
+        },
+        {
+            "key": "NetWorkConnectionType",
+            "value": "Ethernet",
+            "readonly": true
+        },
+        {
+            "key": "NetWorkIPAddress",
+            "value": "{\"dhcp\":true,\"type\":\"Ethernet\",\"ip\":\"10.95.30.215\",\"subnetMask\":\"255.255.254.0\",\"subnetGateway\":\"10.95.30.1\",\"DNS1\":\"0.0.0.0\",\"DNS2\":\"0.0.0.0\"}",
+            "readonly": false
+        },
+        {
+            "key": "NextTimeOffsetTransitionDateTime",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "NumberOfConnectors",
+            "value": "1",
+            "readonly": true
+        },
+        {
+            "key": "OcppUrlProfile",
+            "value": "{\"ocppUrl\":\"ws://10.95.31.95:9220/\",\"ocppVersion\":\"ocpp1.6\",\"ocppSec\":\"ws\",\"Vendor\":\"Custom\"}",
+            "readonly": false
+        },
+        {
+            "key": "OfflineChargeCurrent",
+            "value": "32",
+            "readonly": false
+        },
+        {
+            "key": "operateGuide",
+            "value": "NA",
+            "readonly": false
+        },
+        {
+            "key": "PhoneChargingEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "PhoneChargingIdTag",
+            "value": "PHONE",
+            "readonly": false
+        },
+        {
+            "key": "PhoneChargingNumber",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "PINCodeAuthorizeEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "PlugandChargeMode",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "PosIdTagPrefix",
+            "value": "POSL",
+            "readonly": false
+        },
+        {
+            "key": "PosIdTagSuffixOrder",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "QRChargingEnable",
+            "value": "NA",
+            "readonly": false
+        },
+        {
+            "key": "QrCodeOfConnector1",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "RemoteOMEnable",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "ReportChargingInfoInterval",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "ReserveConnectorZeroSupported",
+            "value": "true",
+            "readonly": true
+        },
+        {
+            "key": "ResetRetries",
+            "value": "1",
+            "readonly": false
+        },
+        {
+            "key": "ReturnGunDetectEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "ReturnGunDetectInterval",
+            "value": "300",
+            "readonly": false
+        },
+        {
+            "key": "SeccLeafSubjectCommonName",
+            "value": "CN-ICE-S-MaxiCommericalAE9007H2GS9C00552D-2",
+            "readonly": false
+        },
+        {
+            "key": "SeccLeafSubjectCountry",
+            "value": "CN",
+            "readonly": false
+        },
+        {
+            "key": "SeccLeafSubjectOrganization",
+            "value": "Autel",
+            "readonly": false
+        },
+        {
+            "key": "SecurityProfile",
+            "value": "0",
+            "readonly": false
+        },
+        {
+            "key": "SendLocalListMaxLength",
+            "value": "10",
+            "readonly": true
+        },
+        {
+            "key": "SendOcmfOnDataTransfer",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "SendOcmfOnStopTransaction",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "StopTransactionOnEVSideDisconnect",
+            "value": "true",
+            "readonly": true
+        },
+        {
+            "key": "StopTransactionOnInvalidId",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "StopTxnAlignedData",
+            "value": "Energy.Active.Import.Register,Voltage,Current.Import,Power.Active.Import,Power.Offered,Current.Offered",
+            "readonly": false
+        },
+        {
+            "key": "StopTxnSampledData",
+            "value": "Energy.Active.Import.Register,Voltage,Current.Import,Power.Active.Import,Power.Offered,Current.Offered",
+            "readonly": false
+        },
+        {
+            "key": "SupplyPhases",
+            "value": "1",
+            "readonly": true
+        },
+        {
+            "key": "SupportedFeatureProfiles",
+            "value": "Core,FirmwareManagement,LocalAuthListManagement,Reservation,SmartCharging,RemoteTrigger",
+            "readonly": true
+        },
+        {
+            "key": "SupportedFileTransferProtocols",
+            "value": "HTTP,HTTPS,FTP,FTPS",
+            "readonly": true
+        },
+        {
+            "key": "SupportedFunctionLists",
+            "value": "WIFI,4G,Ethernet,GroudingType,MaxCurrent,TimeCharging,FreeVend,Autocharge,PnC,CardManager,LEDLight,OCPP2.0.1,DLB,ALM,EMS,PerManentLock,WiSun,RS485,CT",
+            "readonly": true
+        },
+        {
+            "key": "SupportedTemperatureLists",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "TimedChargingEnable",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "TimedChargingIdtag",
+            "value": "01AUTEL0000000000003",
+            "readonly": false
+        },
+        {
+            "key": "TimedChargingWithAuthorize",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "TimeOffset",
+            "value": "",
+            "readonly": false
+        },
+        {
+            "key": "TimeZone",
+            "value": "Europe/Paris",
+            "readonly": false
+        },
+        {
+            "key": "TransactionMessageAttempts",
+            "value": "3",
+            "readonly": false
+        },
+        {
+            "key": "TransactionMessageRetryInterval",
+            "value": "2",
+            "readonly": false
+        },
+        {
+            "key": "UnlockConnectorOnEVSideDisconnect",
+            "value": "true",
+            "readonly": false
+        },
+        {
+            "key": "VehicleIdUploadEnabled",
+            "value": "false",
+            "readonly": false
+        },
+        {
+            "key": "WebSocketPingInterval",
+            "value": "30",
+            "readonly": false
+        },
+        {
+            "key": "WifiLinkInfo",
+            "value": "{\"ssid\":\"\",\"password\":\"\",\"enable\":false}",
+            "readonly": false
+        },
+        {
+            "key": "WirelessNetworkRssi",
+            "value": "",
+            "readonly": true
+        },
+        {
+            "key": "WISUNMeshInfo",
+            "value": "{\"meshAuthKey\":\"04119F42B35000\",\"meshSSID\":\"04119F42B35000\",\"panId\":582,\"type\":1}\n",
+            "readonly": false
+        }
+    ]
+}

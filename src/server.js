@@ -110,7 +110,7 @@ async function bootstrap() {
   app.listen(API_PORT, HOST, () => {
     logger.info(`HTTP API listening on http://${HOST}:${API_PORT} (reachable at http://${apiAdvertised}:${API_PORT})`);
     logger.info(
-      'REST endpoints: POST /start, POST /stop, POST /reset, GET /health, GET /chargers/:id/config, GET /chargers/:id/config/:key'
+      'REST endpoints: POST /start, POST /stop, POST /reset, GET /health, GET /chargers/:id/config, GET /chargers/:id/config/:key, POST /chargers/:id/apply-config'
     );
     logger.info(
       `Borne simulée (identité déclarée): ${SIMULATED_CHARGE_POINT_IDENTITY} → ws://${apiAdvertised}:${OCPP_PORT}/${SIMULATED_CHARGE_POINT_IDENTITY}`

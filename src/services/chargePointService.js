@@ -1,3 +1,10 @@
+const fs = require('node:fs/promises');
+const path = require('node:path');
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 class ChargePointService {
   constructor(logger) {
     this.logger = logger;
@@ -112,6 +119,194 @@ class ChargePointService {
       unknownKeys,
       rawResponse
     };
+  }
+
+  async readConfigurationFile(filePath) {
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+
+    let content;
+    try {
+      content = await fs.readFile(absolutePath, 'utf8');
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        const notFound = new Error(`Configuration file not found: ${filePath}`);
+        notFound.code = 'FILE_NOT_FOUND';
+        throw notFound;
+      }
+
+      const readError = new Error(`Failed to read configuration file "${filePath}": ${error.message}`);
+      readError.code = 'FILE_READ_ERROR';
+      throw readError;
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (error) {
+      const jsonError = new Error(`Invalid JSON in configuration file "${filePath}"`);
+      jsonError.code = 'INVALID_JSON';
+      throw jsonError;
+    }
+
+    const configEntries = Array.isArray(parsed?.configurationKey)
+      ? parsed.configurationKey
+      : Array.isArray(parsed?.keys)
+      ? parsed.keys
+      : null;
+
+    if (!Array.isArray(configEntries)) {
+      const invalid = new Error(
+        `Invalid configuration format in "${filePath}". Expected "configurationKey" (or "keys") array.`
+      );
+      invalid.code = 'INVALID_CONFIG_FILE';
+      throw invalid;
+    }
+
+    return {
+      absolutePath,
+      configEntries
+    };
+  }
+
+  async applyConfigurationFromFile(chargerId, filePath, options = {}) {
+    const dryRun = Boolean(options.dryRun);
+    const delayMs = Number.isFinite(options.delayMs) ? Number(options.delayMs) : 200;
+
+    if (!dryRun && !this.has(chargerId)) {
+      const error = new Error(`Charge point "${chargerId}" not connected`);
+      error.code = 'CHARGE_POINT_NOT_CONNECTED';
+      throw error;
+    }
+
+    const { absolutePath, configEntries } = await this.readConfigurationFile(filePath);
+    this.logger.info(`[${chargerId}] Applying configuration file`, {
+      filePath,
+      absolutePath,
+      entries: configEntries.length,
+      dryRun,
+      delayMs
+    });
+
+    const results = [];
+    let successCount = 0;
+    let errorCount = 0;
+    let skippedReadonlyCount = 0;
+
+    for (let index = 0; index < configEntries.length; index += 1) {
+      const entry = configEntries[index] || {};
+      const key = entry.key;
+      const value = entry.value;
+      const readonly = Boolean(entry.readonly);
+
+      this.logger.info(`[${chargerId}] Applying config ${index + 1}/${configEntries.length} : ${key}`);
+
+      if (!key) {
+        errorCount += 1;
+        results.push({
+          key: '',
+          value: value ?? null,
+          status: 'Invalid',
+          error: 'Missing key name'
+        });
+        continue;
+      }
+
+      if (readonly) {
+        skippedReadonlyCount += 1;
+        results.push({
+          key,
+          value: value ?? null,
+          status: 'SkippedReadonly'
+        });
+        continue;
+      }
+
+      if (dryRun) {
+        results.push({
+          key,
+          value: value ?? null,
+          status: 'DryRun'
+        });
+        successCount += 1;
+        if (delayMs > 0 && index < configEntries.length - 1) {
+          await wait(delayMs);
+        }
+        continue;
+      }
+
+      try {
+        const payload = {
+          key,
+          value: value == null ? '' : String(value)
+        };
+
+        this.logger.info(`[${chargerId}] ChangeConfiguration request`, payload);
+        const response = await this.call(chargerId, 'ChangeConfiguration', payload, { callTimeoutMs: 15000 });
+        this.logger.info(`[${chargerId}] ChangeConfiguration raw response`, response);
+
+        const status = response?.status || 'InvalidResponse';
+        if (status === 'Accepted') {
+          successCount += 1;
+        } else {
+          errorCount += 1;
+        }
+
+        this.logger.info(`[${chargerId}] ChangeConfiguration result`, {
+          key,
+          value: payload.value,
+          status
+        });
+
+        results.push({
+          key,
+          value: payload.value,
+          status
+        });
+      } catch (error) {
+        const message = String(error?.message || '').toLowerCase();
+        const isTimeout = message.includes('timeout') || message.includes('timed out');
+        const normalizedError = isTimeout ? 'Timeout' : error.message;
+
+        errorCount += 1;
+        results.push({
+          key,
+          value: value ?? null,
+          status: 'Error',
+          error: normalizedError
+        });
+
+        this.logger.error(`[${chargerId}] ChangeConfiguration failed`, {
+          key,
+          value,
+          error: normalizedError
+        });
+      }
+
+      if (delayMs > 0 && index < configEntries.length - 1) {
+        await wait(delayMs);
+      }
+    }
+
+    const summary = {
+      chargerId,
+      filePath,
+      dryRun,
+      total: configEntries.length,
+      successCount,
+      errorCount,
+      skippedReadonlyCount,
+      results
+    };
+
+    this.logger.info(`[${chargerId}] Apply configuration summary`, {
+      total: summary.total,
+      successCount,
+      errorCount,
+      skippedReadonlyCount,
+      dryRun
+    });
+
+    return summary;
   }
 }
 

@@ -139,6 +139,145 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Apply Configuration From File",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"filePath\": \"{{configFilePath}}\",\n  \"dryRun\": {{dryRun}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chargers/{{identity}}/apply-config",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chargers",
+            "{{identity}}",
+            "apply-config"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Charger Configuration",
+      "item": [
+        {
+          "name": "Apply Configuration to Charger",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filePath\": \"./configs/autel_key.json\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chargers/{{chargerId}}/apply-config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chargers",
+                "{{chargerId}}",
+                "apply-config"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Apply Config - Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"filePath\": \"./configs/autel_key.json\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/chargers/{{chargerId}}/apply-config",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "chargers",
+                    "{{chargerId}}",
+                    "apply-config"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"chargerId\": \"AE9007H2GS9C00552D\",\n  \"results\": [\n    {\n      \"key\": \"HeartbeatInterval\",\n      \"status\": \"Accepted\"\n    },\n    {\n      \"key\": \"MaxCurrent\",\n      \"status\": \"Rejected\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Charger Configuration",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chargers/{{chargerId}}/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chargers",
+                "{{chargerId}}",
+                "config"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Config Key",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chargers/{{chargerId}}/config/{{configKey}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chargers",
+                "{{chargerId}}",
+                "config",
+                "{{configKey}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -169,6 +308,18 @@
     {
       "key": "configKey",
       "value": "HeartbeatInterval"
+    },
+    {
+      "key": "configFilePath",
+      "value": "./configs/autel_key.json"
+    },
+    {
+      "key": "dryRun",
+      "value": "false"
+    },
+    {
+      "key": "chargerId",
+      "value": "AE9007H2GS9C00552D"
     }
   ]
 }

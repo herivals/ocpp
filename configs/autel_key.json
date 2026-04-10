@@ -1,0 +1,19 @@
+{
+  "configurationKey": [
+    {
+      "key": "HeartbeatInterval",
+      "readonly": false,
+      "value": "300"
+    },
+    {
+      "key": "MeterValueSampleInterval",
+      "readonly": false,
+      "value": "60"
+    },
+    {
+      "key": "AuthorizeRemoteTxRequests",
+      "readonly": false,
+      "value": "true"
+    }
+  ]
+}
