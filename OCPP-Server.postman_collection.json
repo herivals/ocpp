@@ -276,6 +276,73 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Configure WiFi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ssid\": \"{{wifiSsid}}\",\n  \"password\": \"{{wifiPassword}}\",\n  \"enable\": true,\n  \"dryRun\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/chargers/{{chargerId}}/configure-wifi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chargers",
+                "{{chargerId}}",
+                "configure-wifi"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Configure WiFi - Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ssid\": \"Atelier_zone1\",\n  \"password\": \"Soluti0ns_30\",\n  \"enable\": true,\n  \"dryRun\": false\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/chargers/{{chargerId}}/configure-wifi",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "chargers",
+                    "{{chargerId}}",
+                    "configure-wifi"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"chargerId\": \"AE9007H2GS9C00552D\",\n  \"key\": \"WifiLinkInfo\",\n  \"status\": \"Accepted\",\n  \"dryRun\": false,\n  \"appliedValue\": {\n    \"ssid\": \"Atelier_zone1\",\n    \"password\": \"Soluti0ns_30\",\n    \"enable\": true\n  }\n}"
+            }
+          ]
         }
       ]
     }
@@ -320,6 +387,14 @@
     {
       "key": "chargerId",
       "value": "AE9007H2GS9C00552D"
+    },
+    {
+      "key": "wifiSsid",
+      "value": "Atelier_zone3"
+    },
+    {
+      "key": "wifiPassword",
+      "value": "Solutions30"
     }
   ]
 }

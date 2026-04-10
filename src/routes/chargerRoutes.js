@@ -34,6 +34,10 @@ function mapErrorToHttp(error) {
     return { status: 400, body: { error: error.message } };
   }
 
+  if (error?.code === 'INVALID_WIFI_PAYLOAD') {
+    return { status: 400, body: { error: error.message } };
+  }
+
   return { status: 500, body: { error: error?.message || 'Internal error' } };
 }
 
@@ -93,6 +97,34 @@ function createChargerRoutes({ chargePointService, logger }) {
       });
     } catch (error) {
       logger.error(`POST /chargers/${chargerId}/apply-config failed`, {
+        message: error.message,
+        code: error.code
+      });
+      const httpError = mapErrorToHttp(error);
+      return res.status(httpError.status).json(httpError.body);
+    }
+  });
+
+  router.post('/:id/configure-wifi', async (req, res) => {
+    const chargerId = req.params.id;
+    const {
+      ssid = 'Atelier_zone1',
+      password = 'Soluti0ns_30',
+      dryRun = false,
+      enable = true
+    } = req.body || {};
+
+    try {
+      const result = await chargePointService.configureWifi(chargerId, {
+        ssid,
+        password,
+        dryRun,
+        enable
+      });
+
+      return res.json(result);
+    } catch (error) {
+      logger.error(`POST /chargers/${chargerId}/configure-wifi failed`, {
         message: error.message,
         code: error.code
       });

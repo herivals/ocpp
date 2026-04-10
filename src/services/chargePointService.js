@@ -308,6 +308,91 @@ class ChargePointService {
 
     return summary;
   }
+
+  async configureWifi(chargerId, options = {}) {
+    const ssid = typeof options.ssid === 'string' ? options.ssid.trim() : '';
+    const password = typeof options.password === 'string' ? options.password : '';
+    const dryRun = Boolean(options.dryRun);
+    const enable = options.enable !== false;
+
+    if (!ssid) {
+      const error = new Error('WiFi SSID is required');
+      error.code = 'INVALID_WIFI_PAYLOAD';
+      throw error;
+    }
+
+    if (!password) {
+      const error = new Error('WiFi password is required');
+      error.code = 'INVALID_WIFI_PAYLOAD';
+      throw error;
+    }
+
+    if (!dryRun && !this.has(chargerId)) {
+      const error = new Error(`Charge point "${chargerId}" not connected`);
+      error.code = 'CHARGE_POINT_NOT_CONNECTED';
+      throw error;
+    }
+
+    const wifiValueObject = {
+      ssid,
+      password,
+      enable
+    };
+
+    const payload = {
+      key: 'WifiLinkInfo',
+      value: JSON.stringify(wifiValueObject)
+    };
+
+    this.logger.info(`[${chargerId}] Configure WiFi request`, {
+      key: payload.key,
+      value: wifiValueObject,
+      dryRun
+    });
+
+    if (dryRun) {
+      return {
+        chargerId,
+        key: payload.key,
+        status: 'DryRun',
+        dryRun: true,
+        appliedValue: wifiValueObject
+      };
+    }
+
+    try {
+      const response = await this.call(chargerId, 'ChangeConfiguration', payload, { callTimeoutMs: 15000 });
+      this.logger.info(`[${chargerId}] Configure WiFi raw response`, response);
+
+      const status = response?.status || 'InvalidResponse';
+      const result = {
+        chargerId,
+        key: payload.key,
+        status,
+        dryRun: false,
+        appliedValue: wifiValueObject,
+        rawResponse: response
+      };
+
+      this.logger.info(`[${chargerId}] Configure WiFi result`, {
+        key: result.key,
+        status: result.status
+      });
+
+      return result;
+    } catch (error) {
+      const message = String(error?.message || '').toLowerCase();
+      if (message.includes('timeout') || message.includes('timed out')) {
+        const timeoutError = new Error(`Configure WiFi timeout for charger "${chargerId}"`);
+        timeoutError.code = 'OCPP_TIMEOUT';
+        throw timeoutError;
+      }
+
+      const wrapped = new Error(`Configure WiFi failed for charger "${chargerId}": ${error.message}`);
+      wrapped.code = 'CONFIGURE_WIFI_FAILED';
+      throw wrapped;
+    }
+  }
 }
 
 module.exports = {
