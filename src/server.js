@@ -5,6 +5,7 @@ const { createLogger } = require('./utils/logger');
 const { getAdvertisedHost } = require('./utils/networkAddress');
 const { ChargePointService } = require('./services/chargePointService');
 const { createOcppServer } = require('./ocppServer');
+const { createChargerRoutes } = require('./routes/chargerRoutes');
 
 const HOST = process.env.HOST || '0.0.0.0';
 const OCPP_PORT = Number(process.env.OCPP_PORT || 9220);
@@ -25,6 +26,7 @@ async function bootstrap() {
 
   const app = express();
   app.use(express.json());
+  app.use('/chargers', createChargerRoutes({ chargePointService, logger }));
 
   app.get('/health', (_req, res) => {
     res.json({
@@ -107,7 +109,9 @@ async function bootstrap() {
   const apiAdvertised = getAdvertisedHost(HOST);
   app.listen(API_PORT, HOST, () => {
     logger.info(`HTTP API listening on http://${HOST}:${API_PORT} (reachable at http://${apiAdvertised}:${API_PORT})`);
-    logger.info('REST endpoints: POST /start, POST /stop, POST /reset, GET /health');
+    logger.info(
+      'REST endpoints: POST /start, POST /stop, POST /reset, GET /health, GET /chargers/:id/config, GET /chargers/:id/config/:key'
+    );
     logger.info(
       `Borne simulée (identité déclarée): ${SIMULATED_CHARGE_POINT_IDENTITY} → ws://${apiAdvertised}:${OCPP_PORT}/${SIMULATED_CHARGE_POINT_IDENTITY}`
     );

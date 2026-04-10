@@ -100,6 +100,45 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "GetConfiguration (All Keys)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/chargers/{{identity}}/config",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chargers",
+            "{{identity}}",
+            "config"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetConfiguration (Single Key)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/chargers/{{identity}}/config/{{configKey}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chargers",
+            "{{identity}}",
+            "config",
+            "{{configKey}}"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
@@ -126,6 +165,10 @@
     {
       "key": "resetType",
       "value": "Soft"
+    },
+    {
+      "key": "configKey",
+      "value": "HeartbeatInterval"
     }
   ]
 }
