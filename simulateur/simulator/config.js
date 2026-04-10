@@ -24,7 +24,7 @@ function getIdentities() {
       .map((s) => s.trim())
       .filter(Boolean);
   }
-  const single = process.env.OCPP_IDENTITY || 'AUTEL_SIM_001';
+  const single = process.env.OCPP_IDENTITY || 'AE9007H2GS9C00552D';
   return [single];
 }
 

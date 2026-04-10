@@ -38,7 +38,7 @@ Les bornes doivent se connecter avec leur identifiant dans l'URL:
 
 Exemple:
 
-`ws://127.0.0.1:9220/AUTEL_SIM_001`
+`ws://127.0.0.1:9220/AE9007H2GS9C00552D`
 
 ## Supported inbound OCPP 1.6 actions
 
@@ -74,7 +74,7 @@ Body JSON:
 
 ```json
 {
-  "identity": "AUTEL_SIM_001",
+  "identity": "AE9007H2GS9C00552D",
   "idTag": "ABC123",
   "connectorId": 1
 }
@@ -88,7 +88,7 @@ Body JSON:
 
 ```json
 {
-  "identity": "AUTEL_SIM_001",
+  "identity": "AE9007H2GS9C00552D",
   "transactionId": 1001
 }
 ```
@@ -101,7 +101,7 @@ Body JSON:
 
 ```json
 {
-  "identity": "AUTEL_SIM_001",
+  "identity": "AE9007H2GS9C00552D",
   "type": "Soft"
 }
 ```

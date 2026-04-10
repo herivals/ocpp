@@ -105,11 +105,11 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3001"
+      "value": "http://10.95.31.95:3001"
     },
     {
       "key": "identity",
-      "value": "AUTEL_SIM_001"
+      "value": "AE9007H2GS9C00552D"
     },
     {
       "key": "idTag",

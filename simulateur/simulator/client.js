@@ -237,7 +237,7 @@ async function startOneChargePoint(globalConfig, identity) {
 
 async function main() {
   const config = loadConfig();
-  const identities = config.identities.length ? config.identities : ['AUTEL_SIM_001'];
+  const identities = config.identities.length ? config.identities : ['AE9007H2GS9C00552D'];
 
   await Promise.all(identities.map((id) => startOneChargePoint(config, id)));
 }

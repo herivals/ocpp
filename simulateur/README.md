@@ -26,14 +26,14 @@ Ou :
 npm start
 ```
 
-URL et identité par défaut : `ws://localhost:9220`, identité `AUTEL_SIM_001`. Le client se connecte en réalité à `OCPP_URL`/`OCPP_IDENTITY` (identité encodée dans le chemin, comme en OCPP-J).
+URL et identité par défaut : `ws://localhost:9220`, identité `AE9007H2GS9C00552D`. Le client se connecte en réalité à `OCPP_URL`/`OCPP_IDENTITY` (identité encodée dans le chemin, comme en OCPP-J).
 
 ### Erreur `Unauthorized` (401)
 
 Souvent : mauvaise URL (hôte inaccessible ou mauvais port) ou **authentification** requise par le CSMS.
 
 ```bash
-OCPP_URL=ws://172.23.184.174:9220 OCPP_IDENTITY=AUTEL_SIM_001 OCPP_PASSWORD=votre_secret node simulator/client.js
+OCPP_URL=ws://172.23.184.174:9220 OCPP_IDENTITY=AE9007H2GS9C00552D OCPP_PASSWORD=votre_secret node simulator/client.js
 ```
 
 Si le serveur n’utilise pas Basic auth, laissez `OCPP_PASSWORD` vide et vérifiez que l’identité de borne est bien créée / autorisée dans le CSMS.
@@ -45,7 +45,7 @@ Si le serveur n’utilise pas Basic auth, laissez `OCPP_PASSWORD` vide et vérif
 | `OCPP_URL` | URL WebSocket du CSMS (sans le suffixe d’identité ; voir ci-dessous) | `ws://localhost:9220` |
 | `OCPP_PASSWORD` | Mot de passe Basic auth (OCPP Security Profile 1) : utilisateur = `OCPP_IDENTITY` | — |
 | `OCPP_AUTH_PASSWORD` | Alias de `OCPP_PASSWORD` | — |
-| `OCPP_IDENTITY` | Identité d’une borne | `AUTEL_SIM_001` |
+| `OCPP_IDENTITY` | Identité d’une borne | `AE9007H2GS9C00552D` |
 | `OCPP_IDENTITIES` | Plusieurs bornes (séparées par des virgules) | — |
 | `OCPP_CONNECTOR_ID` | Connecteur simulé | `1` |
 | `OCPP_IDTAG` | idTag pour la démo | `AUTELDEMO01` |
