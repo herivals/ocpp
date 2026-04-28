@@ -1,0 +1,25 @@
+services:
+  ocpp-server:
+    build: .
+    ports:
+      - "${OCPP_PORT:-9220}:9220"
+      - "${API_PORT:-3001}:3001"
+    environment:
+      HOST: 0.0.0.0
+      OCPP_PORT: 9220
+      API_PORT: 3001
+      LOG_TO_FILE: ${LOG_TO_FILE:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    restart: unless-stopped
+
+  simulator:
+    build: ./simulateur
+    environment:
+      OCPP_URL: ws://ocpp-server:9220
+      OCPP_IDENTITY: ${OCPP_IDENTITY:-AE9007H2GS9C00552D}
+      OCPP_RUN_DEMO: ${OCPP_RUN_DEMO:-true}
+      OCPP_RECONNECT: ${OCPP_RECONNECT:-true}
+    depends_on:
+      - ocpp-server
+    profiles:
+      - simulator

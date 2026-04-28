@@ -44,6 +44,64 @@ function mapErrorToHttp(error) {
 function createChargerRoutes({ chargePointService, logger }) {
   const router = express.Router();
 
+  // List connected chargers
+  router.get('/', (req, res) => {
+    return res.json({ chargers: chargePointService.list() });
+  });
+
+  // Batch routes must be defined before /:id routes to avoid capture
+  router.post('/batch/apply-config', async (req, res) => {
+    const { chargerIds, filePath, dryRun = false } = req.body || {};
+
+    if (!Array.isArray(chargerIds) || chargerIds.length === 0) {
+      return res.status(400).json({ error: 'chargerIds (non-empty array) is required' });
+    }
+    if (!filePath || typeof filePath !== 'string') {
+      return res.status(400).json({ error: 'filePath is required' });
+    }
+
+    try {
+      const results = await chargePointService.batchApplyConfig(chargerIds, filePath, { dryRun });
+      return res.json({ total: chargerIds.length, results });
+    } catch (error) {
+      logger.error('POST /chargers/batch/apply-config failed', { message: error.message });
+      return res.status(500).json({ error: error.message });
+    }
+  });
+
+  router.post('/batch/configure-wifi', async (req, res) => {
+    const { chargerIds, ssid, password, dryRun = false, enable = true } = req.body || {};
+
+    if (!Array.isArray(chargerIds) || chargerIds.length === 0) {
+      return res.status(400).json({ error: 'chargerIds (non-empty array) is required' });
+    }
+
+    try {
+      const results = await chargePointService.batchConfigureWifi(chargerIds, { ssid, password, dryRun, enable });
+      return res.json({ total: chargerIds.length, results });
+    } catch (error) {
+      logger.error('POST /chargers/batch/configure-wifi failed', { message: error.message });
+      return res.status(500).json({ error: error.message });
+    }
+  });
+
+  router.post('/batch/reset', async (req, res) => {
+    const { chargerIds, type = 'Soft' } = req.body || {};
+
+    if (!Array.isArray(chargerIds) || chargerIds.length === 0) {
+      return res.status(400).json({ error: 'chargerIds (non-empty array) is required' });
+    }
+
+    try {
+      const results = await chargePointService.batchReset(chargerIds, type);
+      return res.json({ total: chargerIds.length, results });
+    } catch (error) {
+      logger.error('POST /chargers/batch/reset failed', { message: error.message });
+      return res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Single charger routes
   router.get('/:id/config', async (req, res) => {
     const chargerId = req.params.id;
     try {

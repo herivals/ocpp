@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCPP Backoffice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style type="text/tailwindcss">
+    .section { @apply hidden; }
+    .section.active { @apply block; }
+    .nav-item.active { @apply bg-gray-800 text-white; }
+    .field-input {
+      @apply w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-sm text-white outline-none transition-colors;
+    }
+    .field-input:focus { @apply border-emerald-500; }
+    .resp-box {
+      @apply bg-slate-950 border border-gray-700 rounded-lg p-4 text-xs font-mono whitespace-pre-wrap overflow-auto text-slate-400;
+      max-height: 480px;
+    }
+    .resp-box.ok { @apply border-emerald-700 text-emerald-300; }
+    .resp-box.err { @apply border-red-700 text-red-300; }
+    .send-btn {
+      @apply px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-md transition-colors cursor-pointer;
+    }
+    .send-btn:disabled { @apply opacity-50 cursor-default; }
+    .send-btn.warn { @apply bg-amber-600 hover:bg-amber-500; }
+    .batch-tab.active { @apply bg-gray-800 text-white; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex text-sm antialiased">
+
+  <!-- Sidebar -->
+  <aside class="w-64 shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col h-screen sticky top-0">
+
+    <div class="p-5 border-b border-gray-800 shrink-0">
+      <p class="text-xs font-semibold tracking-widest text-emerald-400 uppercase">OCPP 1.6</p>
+      <h1 class="text-base font-bold text-white mt-0.5">Central System</h1>
+    </div>
+
+    <div class="px-4 py-3 border-b border-gray-800 shrink-0">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-gray-500 uppercase tracking-wide font-medium">Bornes connectées</span>
+        <button onclick="refreshHealth()" class="text-gray-500 hover:text-white transition-colors" title="Rafraîchir">↻</button>
+      </div>
+      <div id="charger-list" class="text-xs text-gray-600 italic">—</div>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+      <p class="text-xs text-gray-600 uppercase tracking-wider px-2 py-1.5 font-medium">Multi-bornes</p>
+      <button onclick="showSection('batch', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-violet-900 text-violet-300 rounded px-1.5 py-0.5 shrink-0">BATCH</span>
+        <span class="truncate text-xs">Config en chaîne</span>
+      </button>
+
+      <p class="text-xs text-gray-600 uppercase tracking-wider px-2 py-1.5 mt-3 font-medium">Statut</p>
+      <button onclick="showSection('health', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-1.5 py-0.5 shrink-0">GET</span>
+        <span class="truncate text-xs">/health</span>
+      </button>
+
+      <p class="text-xs text-gray-600 uppercase tracking-wider px-2 py-1.5 mt-3 font-medium">Transactions</p>
+      <button onclick="showSection('start', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-1.5 py-0.5 shrink-0">POST</span>
+        <span class="truncate text-xs">/start</span>
+      </button>
+      <button onclick="showSection('stop', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-1.5 py-0.5 shrink-0">POST</span>
+        <span class="truncate text-xs">/stop</span>
+      </button>
+      <button onclick="showSection('reset-cp', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-amber-900 text-amber-300 rounded px-1.5 py-0.5 shrink-0">POST</span>
+        <span class="truncate text-xs">/reset</span>
+      </button>
+
+      <p class="text-xs text-gray-600 uppercase tracking-wider px-2 py-1.5 mt-3 font-medium">Configuration</p>
+      <button onclick="showSection('config-all', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-1.5 py-0.5 shrink-0">GET</span>
+        <span class="truncate text-xs">/chargers/:id/config</span>
+      </button>
+      <button onclick="showSection('config-key', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-1.5 py-0.5 shrink-0">GET</span>
+        <span class="truncate text-xs">/chargers/:id/config/:key</span>
+      </button>
+      <button onclick="showSection('apply-config', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-1.5 py-0.5 shrink-0">POST</span>
+        <span class="truncate text-xs">/chargers/:id/apply-config</span>
+      </button>
+
+      <p class="text-xs text-gray-600 uppercase tracking-wider px-2 py-1.5 mt-3 font-medium">Réseau</p>
+      <button onclick="showSection('wifi', this)" class="nav-item w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-2.5">
+        <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-1.5 py-0.5 shrink-0">POST</span>
+        <span class="truncate text-xs">/chargers/:id/configure-wifi</span>
+      </button>
+    </nav>
+
+    <div class="p-4 border-t border-gray-800 shrink-0">
+      <label class="block text-xs text-gray-500 mb-1.5">API URL</label>
+      <input id="api-base" type="text" class="field-input text-xs" />
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto p-10">
+    <div class="max-w-2xl">
+
+      <!-- Health -->
+      <section id="section-health" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-2 py-1">GET</span>
+            <h2 class="text-xl font-semibold text-white">/health</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Vérifie l'état du serveur et retourne les bornes actuellement connectées.</p>
+        </header>
+        <button onclick="callHealth(this)" class="send-btn">Envoyer</button>
+        <div id="resp-health" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Start -->
+      <section id="section-start" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-2 py-1">POST</span>
+            <h2 class="text-xl font-semibold text-white">/start</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Démarre une transaction à distance sur une borne (RemoteStartTransaction).</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">identity <span class="text-red-400">*</span></label>
+            <input id="start-identity" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">idTag <span class="text-red-400">*</span></label>
+            <input id="start-idtag" type="text" placeholder="AUTELDEMO01" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">connectorId</label>
+            <input id="start-connector" type="number" value="1" min="1" class="field-input" />
+          </div>
+        </div>
+        <button onclick="callStart(this)" class="send-btn">Envoyer</button>
+        <div id="resp-start" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Stop -->
+      <section id="section-stop" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-2 py-1">POST</span>
+            <h2 class="text-xl font-semibold text-white">/stop</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Arrête une transaction en cours sur une borne (RemoteStopTransaction).</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">identity <span class="text-red-400">*</span></label>
+            <input id="stop-identity" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">transactionId <span class="text-red-400">*</span></label>
+            <input id="stop-txid" type="number" placeholder="1001" class="field-input" />
+          </div>
+        </div>
+        <button onclick="callStop(this)" class="send-btn">Envoyer</button>
+        <div id="resp-stop" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Reset -->
+      <section id="section-reset-cp" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-amber-900 text-amber-300 rounded px-2 py-1">POST</span>
+            <h2 class="text-xl font-semibold text-white">/reset</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Redémarre une borne. <strong class="text-gray-300">Soft</strong> = attend la fin de session, <strong class="text-gray-300">Hard</strong> = reboot immédiat.</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">identity <span class="text-red-400">*</span></label>
+            <input id="reset-identity" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">type</label>
+            <select id="reset-type" class="field-input">
+              <option value="Soft">Soft</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="callReset(this)" class="send-btn warn">Envoyer</button>
+        <div id="resp-reset-cp" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Config All -->
+      <section id="section-config-all" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-2 py-1">GET</span>
+            <h2 class="text-xl font-semibold text-white">/chargers/:id/config</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Récupère toutes les clés de configuration OCPP d'une borne (GetConfiguration).</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5 col-span-2">
+            <label class="text-xs text-gray-400 font-medium">id (identity) <span class="text-red-400">*</span></label>
+            <input id="config-all-id" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+        </div>
+        <button onclick="callConfigAll(this)" class="send-btn">Envoyer</button>
+        <div id="resp-config-all" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Config Key -->
+      <section id="section-config-key" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-blue-900 text-blue-300 rounded px-2 py-1">GET</span>
+            <h2 class="text-xl font-semibold text-white">/chargers/:id/config/:key</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Récupère la valeur d'une clé de configuration spécifique.</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">id (identity) <span class="text-red-400">*</span></label>
+            <input id="config-key-id" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">key <span class="text-red-400">*</span></label>
+            <input id="config-key-key" type="text" placeholder="HeartbeatInterval" class="field-input" />
+          </div>
+        </div>
+        <button onclick="callConfigKey(this)" class="send-btn">Envoyer</button>
+        <div id="resp-config-key" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Apply Config -->
+      <section id="section-apply-config" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-2 py-1">POST</span>
+            <h2 class="text-xl font-semibold text-white">/chargers/:id/apply-config</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Applique en masse un fichier JSON de configuration à une borne (ChangeConfiguration en boucle).</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">id (identity) <span class="text-red-400">*</span></label>
+            <input id="apply-id" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">filePath <span class="text-red-400">*</span></label>
+            <input id="apply-filepath" type="text" placeholder="configs/autel_key.json" class="field-input" />
+          </div>
+          <label class="flex items-center gap-2.5 text-xs text-gray-400 cursor-pointer col-span-2 pt-1">
+            <input id="apply-dryrun" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+            dryRun — simuler sans envoyer à la borne
+          </label>
+        </div>
+        <button onclick="callApplyConfig(this)" class="send-btn">Envoyer</button>
+        <div id="resp-apply-config" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- WiFi -->
+      <section id="section-wifi" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-emerald-900 text-emerald-300 rounded px-2 py-1">POST</span>
+            <h2 class="text-xl font-semibold text-white">/chargers/:id/configure-wifi</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Configure le WiFi d'une borne via OCPP ChangeConfiguration (clé <code class="text-gray-300 bg-gray-800 px-1 rounded">WifiLinkInfo</code>).</p>
+        </header>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">id (identity) <span class="text-red-400">*</span></label>
+            <input id="wifi-id" type="text" placeholder="AE9007H2GS9C00552D" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">ssid <span class="text-red-400">*</span></label>
+            <input id="wifi-ssid" type="text" placeholder="MonReseau_WiFi" class="field-input" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs text-gray-400 font-medium">password <span class="text-red-400">*</span></label>
+            <input id="wifi-password" type="password" placeholder="••••••••" class="field-input" />
+          </div>
+          <div class="flex items-center gap-5 col-span-2 pt-1">
+            <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+              <input id="wifi-enable" type="checkbox" checked class="w-4 h-4 accent-emerald-500" />
+              enable
+            </label>
+            <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+              <input id="wifi-dryrun" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+              dryRun
+            </label>
+          </div>
+        </div>
+        <button onclick="callWifi(this)" class="send-btn">Envoyer</button>
+        <div id="resp-wifi" class="resp-box hidden mt-5"></div>
+      </section>
+
+      <!-- Multi-bornes / Batch -->
+      <section id="section-batch" class="section">
+        <header class="mb-7">
+          <div class="flex items-center gap-3 mb-1.5">
+            <span class="text-xs font-bold bg-violet-900 text-violet-300 rounded px-2 py-1">BATCH</span>
+            <h2 class="text-xl font-semibold text-white">Configuration en chaîne</h2>
+          </div>
+          <p class="text-gray-500 text-xs">Sélectionnez plusieurs bornes connectées et appliquez une opération à toutes simultanément.</p>
+        </header>
+
+        <!-- Charger selection -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Bornes connectées</span>
+            <div class="flex items-center gap-3">
+              <button onclick="toggleAllChargers(true)" class="text-xs text-gray-500 hover:text-gray-200 transition-colors">Tout sél.</button>
+              <span class="text-gray-700">·</span>
+              <button onclick="toggleAllChargers(false)" class="text-xs text-gray-500 hover:text-gray-200 transition-colors">Désél.</button>
+              <button onclick="loadChargers()" class="text-gray-500 hover:text-white transition-colors ml-1" title="Rafraîchir">↻</button>
+            </div>
+          </div>
+          <div id="batch-charger-list" class="border border-gray-700 rounded-lg overflow-hidden min-h-10">
+            <p class="text-xs text-gray-600 italic p-4">Chargement...</p>
+          </div>
+        </div>
+
+        <!-- Operation tabs -->
+        <div class="flex gap-1 mb-5 border border-gray-700 rounded-lg p-1 bg-gray-900">
+          <button onclick="showBatchOp('apply-config', this)" class="batch-tab active flex-1 py-2 px-3 rounded-md text-xs font-medium text-gray-400 hover:text-white transition-colors">Apply Config</button>
+          <button onclick="showBatchOp('wifi', this)" class="batch-tab flex-1 py-2 px-3 rounded-md text-xs font-medium text-gray-400 hover:text-white transition-colors">WiFi</button>
+          <button onclick="showBatchOp('reset', this)" class="batch-tab flex-1 py-2 px-3 rounded-md text-xs font-medium text-gray-400 hover:text-white transition-colors">Reset</button>
+        </div>
+
+        <!-- Apply Config form -->
+        <div id="batch-op-apply-config" class="batch-op">
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="space-y-1.5 col-span-2">
+              <label class="text-xs text-gray-400 font-medium">filePath <span class="text-red-400">*</span></label>
+              <input id="batch-apply-filepath" type="text" placeholder="configs/autel_key.json" class="field-input" />
+            </div>
+            <label class="flex items-center gap-2.5 text-xs text-gray-400 cursor-pointer col-span-2">
+              <input id="batch-apply-dryrun" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+              dryRun — simuler sans envoyer aux bornes
+            </label>
+          </div>
+          <button onclick="sendBatchApplyConfig(this)" class="batch-send-btn send-btn">Sélectionner des bornes</button>
+        </div>
+
+        <!-- WiFi form -->
+        <div id="batch-op-wifi" class="batch-op hidden">
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="space-y-1.5">
+              <label class="text-xs text-gray-400 font-medium">ssid <span class="text-red-400">*</span></label>
+              <input id="batch-wifi-ssid" type="text" placeholder="MonReseau_WiFi" class="field-input" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs text-gray-400 font-medium">password <span class="text-red-400">*</span></label>
+              <input id="batch-wifi-password" type="password" placeholder="••••••••" class="field-input" />
+            </div>
+            <div class="flex items-center gap-5 col-span-2 pt-1">
+              <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                <input id="batch-wifi-enable" type="checkbox" checked class="w-4 h-4 accent-emerald-500" />
+                enable
+              </label>
+              <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                <input id="batch-wifi-dryrun" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+                dryRun
+              </label>
+            </div>
+          </div>
+          <button onclick="sendBatchWifi(this)" class="batch-send-btn send-btn">Sélectionner des bornes</button>
+        </div>
+
+        <!-- Reset form -->
+        <div id="batch-op-reset" class="batch-op hidden">
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="space-y-1.5">
+              <label class="text-xs text-gray-400 font-medium">type</label>
+              <select id="batch-reset-type" class="field-input">
+                <option value="Soft">Soft</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="sendBatchReset(this)" class="batch-send-btn send-btn warn">Sélectionner des bornes</button>
+        </div>
+
+        <!-- Results -->
+        <div id="batch-results" class="hidden mt-7">
+          <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">Résultats</p>
+          <div id="batch-results-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const apiBase = () => $('api-base').value.replace(/\/$/, '');
+
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      $('section-' + id).classList.add('active');
+      btn.classList.add('active');
+      if (id === 'batch') loadChargers();
+    }
+
+    function showResp(id, data, ok) {
+      const el = $('resp-' + id);
+      el.classList.remove('hidden', 'ok', 'err');
+      el.classList.add(ok ? 'ok' : 'err');
+      el.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function request(path, opts = {}) {
+      try {
+        const res = await fetch(apiBase() + path, opts);
+        let data;
+        try { data = await res.json(); } catch { data = { raw: 'Réponse non-JSON' }; }
+        return { ok: res.ok, data };
+      } catch (e) {
+        return { ok: false, data: { error: e.message } };
+      }
+    }
+
+    function post(path, body) {
+      return request(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+
+    async function withLoader(btn, fn) {
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = '…';
+      try { await fn(); } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    }
+
+    async function callHealth(btn) {
+      await withLoader(btn, async () => {
+        const { ok, data } = await request('/health');
+        showResp('health', data, ok);
+        updateChargerList(data.connectedChargePoints || []);
+      });
+    }
+
+    async function callStart(btn) {
+      await withLoader(btn, async () => {
+        const { ok, data } = await post('/start', {
+          identity: $('start-identity').value,
+          idTag: $('start-idtag').value,
+          connectorId: parseInt($('start-connector').value) || 1
+        });
+        showResp('start', data, ok);
+      });
+    }
+
+    async function callStop(btn) {
+      await withLoader(btn, async () => {
+        const { ok, data } = await post('/stop', {
+          identity: $('stop-identity').value,
+          transactionId: parseInt($('stop-txid').value)
+        });
+        showResp('stop', data, ok);
+      });
+    }
+
+    async function callReset(btn) {
+      await withLoader(btn, async () => {
+        const { ok, data } = await post('/reset', {
+          identity: $('reset-identity').value,
+          type: $('reset-type').value
+        });
+        showResp('reset-cp', data, ok);
+      });
+    }
+
+    async function callConfigAll(btn) {
+      await withLoader(btn, async () => {
+        const id = encodeURIComponent($('config-all-id').value);
+        const { ok, data } = await request(`/chargers/${id}/config`);
+        showResp('config-all', data, ok);
+      });
+    }
+
+    async function callConfigKey(btn) {
+      await withLoader(btn, async () => {
+        const id = encodeURIComponent($('config-key-id').value);
+        const key = encodeURIComponent($('config-key-key').value);
+        const { ok, data } = await request(`/chargers/${id}/config/${key}`);
+        showResp('config-key', data, ok);
+      });
+    }
+
+    async function callApplyConfig(btn) {
+      await withLoader(btn, async () => {
+        const id = encodeURIComponent($('apply-id').value);
+        const { ok, data } = await post(`/chargers/${id}/apply-config`, {
+          filePath: $('apply-filepath').value,
+          dryRun: $('apply-dryrun').checked
+        });
+        showResp('apply-config', data, ok);
+      });
+    }
+
+    async function callWifi(btn) {
+      await withLoader(btn, async () => {
+        const id = encodeURIComponent($('wifi-id').value);
+        const { ok, data } = await post(`/chargers/${id}/configure-wifi`, {
+          ssid: $('wifi-ssid').value,
+          password: $('wifi-password').value,
+          enable: $('wifi-enable').checked,
+          dryRun: $('wifi-dryrun').checked
+        });
+        showResp('wifi', data, ok);
+      });
+    }
+
+    function updateChargerList(chargers) {
+      const el = $('charger-list');
+      if (!chargers.length) {
+        el.innerHTML = '<span class="italic">Aucune borne connectée</span>';
+        return;
+      }
+      el.innerHTML = chargers.map(id => `
+        <div class="flex items-center gap-1.5 py-0.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 inline-block"></span>
+          <span class="text-gray-300 truncate">${id}</span>
+        </div>
+      `).join('');
+    }
+
+    async function refreshHealth() {
+      const { data } = await request('/health');
+      updateChargerList(data?.connectedChargePoints || []);
+    }
+
+    // --- Batch / Multi-bornes ---
+    let batchOpType = 'apply-config';
+
+    function showBatchOp(op, btn) {
+      document.querySelectorAll('.batch-op').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.batch-tab').forEach(b => b.classList.remove('active'));
+      $('batch-op-' + op).classList.remove('hidden');
+      btn.classList.add('active');
+      batchOpType = op;
+    }
+
+    async function loadChargers() {
+      const { data } = await request('/chargers');
+      const chargers = Array.isArray(data?.chargers) ? data.chargers : [];
+      renderChargerCheckboxes(chargers);
+      updateChargerList(chargers);
+    }
+
+    function renderChargerCheckboxes(chargers) {
+      const el = $('batch-charger-list');
+      if (!chargers.length) {
+        el.innerHTML = '<p class="text-xs text-gray-600 italic p-4">Aucune borne connectée. Démarrez le simulateur ou connectez une borne.</p>';
+        updateBatchSendLabels();
+        return;
+      }
+      el.innerHTML = chargers.map(id => `
+        <label class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-800/60 transition-colors border-b border-gray-800/60 last:border-0">
+          <input type="checkbox" value="${id}" checked onchange="updateBatchSendLabels()" class="batch-cp-check w-4 h-4 accent-violet-500" />
+          <span class="text-xs font-mono text-gray-300">${id}</span>
+        </label>
+      `).join('');
+      updateBatchSendLabels();
+    }
+
+    function getSelectedChargers() {
+      return [...document.querySelectorAll('.batch-cp-check:checked')].map(el => el.value);
+    }
+
+    function toggleAllChargers(checked) {
+      document.querySelectorAll('.batch-cp-check').forEach(el => { el.checked = checked; });
+      updateBatchSendLabels();
+    }
+
+    function updateBatchSendLabels() {
+      const count = getSelectedChargers().length;
+      const label = count === 0
+        ? 'Sélectionner des bornes'
+        : `Envoyer à ${count} borne${count > 1 ? 's' : ''}`;
+      document.querySelectorAll('.batch-send-btn').forEach(btn => {
+        btn.textContent = label;
+        btn.disabled = count === 0;
+      });
+    }
+
+    function renderBatchResults(results) {
+      $('batch-results').classList.remove('hidden');
+      $('batch-results-list').innerHTML = results.map(r => {
+        const ok = r.ok !== false;
+        let summary = '';
+        if (batchOpType === 'apply-config' && ok && r.summary) {
+          const s = r.summary;
+          summary = `${s.successCount}/${s.total} clés${s.dryRun ? ' · dryRun' : ''}${s.errorCount ? ` · ${s.errorCount} erreur(s)` : ''}`;
+        } else if (batchOpType === 'wifi' && ok) {
+          summary = `WiFi — ${r.result?.status || '?'}${r.result?.dryRun ? ' · dryRun' : ''}`;
+        } else if (batchOpType === 'reset' && ok) {
+          summary = `Reset — ${r.response?.status || 'OK'}`;
+        } else {
+          summary = r.error || 'Erreur inconnue';
+          if (r.code) summary += ` (${r.code})`;
+        }
+        return `
+          <div class="flex items-center gap-3 px-4 py-3 rounded-lg ${ok ? 'bg-emerald-950/30 border border-emerald-900/40' : 'bg-red-950/30 border border-red-900/40'}">
+            <span class="text-sm shrink-0 ${ok ? 'text-emerald-400' : 'text-red-400'}">${ok ? '✓' : '✗'}</span>
+            <span class="text-xs font-mono text-gray-200 shrink-0">${r.chargerId}</span>
+            <span class="text-xs text-gray-500 truncate">${summary}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function sendBatchApplyConfig(btn) {
+      const ids = getSelectedChargers();
+      if (!ids.length) return;
+      await withLoader(btn, async () => {
+        const { data } = await post('/chargers/batch/apply-config', {
+          chargerIds: ids,
+          filePath: $('batch-apply-filepath').value,
+          dryRun: $('batch-apply-dryrun').checked
+        });
+        if (data.results) renderBatchResults(data.results);
+      });
+      updateBatchSendLabels();
+    }
+
+    async function sendBatchWifi(btn) {
+      const ids = getSelectedChargers();
+      if (!ids.length) return;
+      await withLoader(btn, async () => {
+        const { data } = await post('/chargers/batch/configure-wifi', {
+          chargerIds: ids,
+          ssid: $('batch-wifi-ssid').value,
+          password: $('batch-wifi-password').value,
+          enable: $('batch-wifi-enable').checked,
+          dryRun: $('batch-wifi-dryrun').checked
+        });
+        if (data.results) renderBatchResults(data.results);
+      });
+      updateBatchSendLabels();
+    }
+
+    async function sendBatchReset(btn) {
+      const ids = getSelectedChargers();
+      if (!ids.length) return;
+      await withLoader(btn, async () => {
+        const { data } = await post('/chargers/batch/reset', {
+          chargerIds: ids,
+          type: $('batch-reset-type').value
+        });
+        if (data.results) renderBatchResults(data.results);
+      });
+      updateBatchSendLabels();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      $('api-base').value = window.location.origin;
+      const first = document.querySelector('.nav-item');
+      if (first) first.click();
+      refreshHealth();
+    });
+  </script>
+
+</body>
+</html>

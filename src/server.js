@@ -1,3 +1,4 @@
+const path = require('node:path');
 const express = require('express');
 
 const { SIMULATED_CHARGE_POINT_IDENTITY } = require('./config/chargePoint');
@@ -25,6 +26,7 @@ async function bootstrap() {
   await ocppServer.start();
 
   const app = express();
+  app.use(express.static(path.join(__dirname, '..', 'public')));
   app.use(express.json());
   app.use('/chargers', createChargerRoutes({ chargePointService, logger }));
 

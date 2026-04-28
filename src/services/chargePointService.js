@@ -393,6 +393,45 @@ class ChargePointService {
       throw wrapped;
     }
   }
+
+  async batchApplyConfig(chargerIds, filePath, options = {}) {
+    return Promise.all(
+      chargerIds.map(async (id) => {
+        try {
+          const summary = await this.applyConfigurationFromFile(id, filePath, options);
+          return { chargerId: id, ok: true, summary };
+        } catch (e) {
+          return { chargerId: id, ok: false, error: e.message, code: e.code };
+        }
+      })
+    );
+  }
+
+  async batchConfigureWifi(chargerIds, options = {}) {
+    return Promise.all(
+      chargerIds.map(async (id) => {
+        try {
+          const result = await this.configureWifi(id, options);
+          return { chargerId: id, ok: true, result };
+        } catch (e) {
+          return { chargerId: id, ok: false, error: e.message, code: e.code };
+        }
+      })
+    );
+  }
+
+  async batchReset(chargerIds, type = 'Soft') {
+    return Promise.all(
+      chargerIds.map(async (id) => {
+        try {
+          const response = await this.reset(id, { type });
+          return { chargerId: id, ok: true, response };
+        } catch (e) {
+          return { chargerId: id, ok: false, error: e.message, code: e.code };
+        }
+      })
+    );
+  }
 }
 
 module.exports = {
